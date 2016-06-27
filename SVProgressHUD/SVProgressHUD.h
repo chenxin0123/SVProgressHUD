@@ -24,11 +24,15 @@ extern NSString * const SVProgressHUDDidAppearNotification;
 extern NSString * const SVProgressHUDStatusUserInfoKey;
 
 typedef NS_ENUM(NSInteger, SVProgressHUDStyle) {
+    //白底黑字
     SVProgressHUDStyleLight,        // default style, white HUD with black text, HUD background will be blurred on iOS 8 and above
+    //黑底白字
     SVProgressHUDStyleDark,         // black HUD and white text, HUD background will be blurred on iOS 8 and above
+    //自定义
     SVProgressHUDStyleCustom        // uses the fore- and background color properties
 };
 
+///是否接受用户事件 以及是否是背景暗淡
 typedef NS_ENUM(NSUInteger, SVProgressHUDMaskType) {
     SVProgressHUDMaskTypeNone = 1,  // default mask type, allow user interactions while HUD is displayed
     SVProgressHUDMaskTypeClear,     // don't allow user interactions
@@ -38,8 +42,8 @@ typedef NS_ENUM(NSUInteger, SVProgressHUDMaskType) {
 };
 
 typedef NS_ENUM(NSUInteger, SVProgressHUDAnimationType) {
-    SVProgressHUDAnimationTypeFlat,     // default animation type, custom flat animation (indefinite animated ring)
-    SVProgressHUDAnimationTypeNative    // iOS native UIActivityIndicatorView
+    SVProgressHUDAnimationTypeFlat,     // default animation type, custom flat animation (indefinite animated ring) 圈圈
+    SVProgressHUDAnimationTypeNative    // iOS native UIActivityIndicatorView 菊花
 };
 
 typedef void (^SVProgressHUDDismissCompletion)(void);
@@ -48,13 +52,21 @@ typedef void (^SVProgressHUDDismissCompletion)(void);
 
 #pragma mark - Customization
 
+///hud颜色风格
 @property (assign, nonatomic) SVProgressHUDStyle defaultStyle UI_APPEARANCE_SELECTOR;                   // default is SVProgressHUDStyleLight
+///整体风格 dim等
 @property (assign, nonatomic) SVProgressHUDMaskType defaultMaskType UI_APPEARANCE_SELECTOR;             // default is SVProgressHUDMaskTypeNone
+///动画样式 菊花 圈圈
 @property (assign, nonatomic) SVProgressHUDAnimationType defaultAnimationType UI_APPEARANCE_SELECTOR;   // default is SVProgressHUDAnimationTypeFlat
+///最小尺寸
 @property (assign, nonatomic) CGSize minimumSize UI_APPEARANCE_SELECTOR;            // default is CGSizeZero, can be used to avoid resizing for a larger message
+///圈圈的线宽
 @property (assign, nonatomic) CGFloat ringThickness UI_APPEARANCE_SELECTOR;         // default is 2 pt
+///圈圈半径 带文字的时候有效
 @property (assign, nonatomic) CGFloat ringRadius UI_APPEARANCE_SELECTOR;            // default is 18 pt
+///圈圈半径 无文字时有效
 @property (assign, nonatomic) CGFloat ringNoTextRadius UI_APPEARANCE_SELECTOR;      // default is 24 pt
+///hud的脚半径
 @property (assign, nonatomic) CGFloat cornerRadius UI_APPEARANCE_SELECTOR;          // default is 14 pt
 @property (strong, nonatomic) UIFont *font UI_APPEARANCE_SELECTOR;                  // default is [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline]
 @property (strong, nonatomic) UIColor *backgroundColor UI_APPEARANCE_SELECTOR;      // default is [UIColor whiteColor]
@@ -64,10 +76,12 @@ typedef void (^SVProgressHUDDismissCompletion)(void);
 @property (strong, nonatomic) UIImage *successImage UI_APPEARANCE_SELECTOR;         // default is the bundled success image provided by Freepik
 @property (strong, nonatomic) UIImage *errorImage UI_APPEARANCE_SELECTOR;           // default is the bundled error image provided by Freepik
 @property (strong, nonatomic) UIView *viewForExtension UI_APPEARANCE_SELECTOR;      // default is nil, only used if #define SV_APP_EXTENSIONS is set
+///最短显示时间
 @property (assign, nonatomic) NSTimeInterval minimumDismissTimeInterval;            // default is 5.0 seconds
 
 @property (assign, nonatomic) UIOffset offsetFromCenter UI_APPEARANCE_SELECTOR;     // default is 0, 0
 
+///显示隐藏动画的时间
 @property (assign, nonatomic) NSTimeInterval fadeInAnimationDuration;  // default is 0.15
 @property (assign, nonatomic) NSTimeInterval fadeOutAnimationDuration; // default is 0.15
 
@@ -94,6 +108,7 @@ typedef void (^SVProgressHUDDismissCompletion)(void);
 
 #pragma mark - Show Methods
 
+///[self showWithStatus:nil];
 + (void)show;
 + (void)showWithMaskType:(SVProgressHUDMaskType)maskType __attribute__((deprecated("Use show and setDefaultMaskType: instead.")));
 + (void)showWithStatus:(NSString*)status;

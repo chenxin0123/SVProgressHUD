@@ -23,7 +23,7 @@
         _ringAnimatedLayer = nil;
     }
 }
-
+//r
 - (void)layoutAnimatedLayer {
     CALayer *layer = self.ringAnimatedLayer;
     [self.layer addSublayer:layer];
@@ -32,7 +32,7 @@
     CGFloat heightDiff = CGRectGetHeight(self.bounds) - CGRectGetHeight(layer.bounds);
     layer.position = CGPointMake(CGRectGetWidth(self.bounds) - CGRectGetWidth(layer.bounds) / 2 - widthDiff / 2, CGRectGetHeight(self.bounds) - CGRectGetHeight(layer.bounds) / 2 - heightDiff / 2);
 }
-
+//r
 - (CAShapeLayer*)ringAnimatedLayer {
     if(!_ringAnimatedLayer) {
         CGPoint arcCenter = CGPointMake(self.radius+self.strokeThickness/2+5, self.radius+self.strokeThickness/2+5);
@@ -50,7 +50,7 @@
     }
     return _ringAnimatedLayer;
 }
-
+//r
 - (void)setFrame:(CGRect)frame {
     if(!CGRectEqualToRect(frame, super.frame)) {
         [super setFrame:frame];
@@ -61,7 +61,7 @@
     }
     
 }
-
+//r
 - (void)setRadius:(CGFloat)radius {
     if(radius != _radius) {
         _radius = radius;
@@ -74,23 +74,23 @@
         }
     }
 }
-
+//r
 - (void)setStrokeColor:(UIColor*)strokeColor {
     _strokeColor = strokeColor;
     _ringAnimatedLayer.strokeColor = strokeColor.CGColor;
 }
-
+//r
 - (void)setStrokeThickness:(CGFloat)strokeThickness {
     _strokeThickness = strokeThickness;
     _ringAnimatedLayer.lineWidth = _strokeThickness;
 }
-
+//r
 - (void)setStrokeEnd:(CGFloat)strokeEnd {
     _strokeEnd = strokeEnd;
     _ringAnimatedLayer.strokeEnd = _strokeEnd;
 }
 
-
+//r
 - (CGSize)sizeThatFits:(CGSize)size {
     return CGSizeMake((self.radius+self.strokeThickness/2+5)*2, (self.radius+self.strokeThickness/2+5)*2);
 }

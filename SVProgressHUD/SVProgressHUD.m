@@ -13,8 +13,9 @@
 #import "SVIndefiniteAnimatedView.h"
 #import "SVProgressAnimatedView.h"
 #import "SVRadialGradientLayer.h"
-
+//整个覆盖被点击通知
 NSString * const SVProgressHUDDidReceiveTouchEventNotification = @"SVProgressHUDDidReceiveTouchEventNotification";
+//hud被点击
 NSString * const SVProgressHUDDidTouchDownInsideNotification = @"SVProgressHUDDidTouchDownInsideNotification";
 NSString * const SVProgressHUDWillDisappearNotification = @"SVProgressHUDWillDisappearNotification";
 NSString * const SVProgressHUDDidDisappearNotification = @"SVProgressHUDDidDisappearNotification";
@@ -23,28 +24,37 @@ NSString * const SVProgressHUDDidAppearNotification = @"SVProgressHUDDidAppearNo
 
 NSString * const SVProgressHUDStatusUserInfoKey = @"SVProgressHUDStatusUserInfoKey";
 
+///motioneffect的距离
 static const CGFloat SVProgressHUDParallaxDepthPoints = 10;
 static const CGFloat SVProgressHUDUndefinedProgress = -1;
+//默认的淡入淡出的动画时间
 static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 @interface SVProgressHUD ()
-
+/// An image will dismissed automatically. Therefore we start a timer which then will call dismiss after the predefined duration
 @property (nonatomic, strong, readonly) NSTimer *fadeOutTimer;
 @property (nonatomic, readonly, getter = isClear) BOOL clear;
 
+///getter 覆盖整个屏幕
 @property (nonatomic, strong) UIControl *overlayView;
 @property (nonatomic, strong) UIView *hudView;
 
 @property (nonatomic, strong) UILabel *statusLabel;
+///图片打钩 打叉 getter
 @property (nonatomic, strong) UIImageView *imageView;
+///无线转的圈圈
 @property (nonatomic, strong) UIView *indefiniteAnimatedView;
+///进度圈圈
 @property (nonatomic, strong) SVProgressAnimatedView *ringView;
+///进度圈圈的背景圈
 @property (nonatomic, strong) SVProgressAnimatedView *backgroundRingView;
 @property (nonatomic, strong) CALayer *backgroundLayer;
 
 @property (nonatomic, readwrite) CGFloat progress;
+///use for push pop
 @property (nonatomic, readwrite) NSUInteger activityCount;
 
+///当前弹出的键盘高度 无键盘则为0
 @property (nonatomic, readonly) CGFloat visibleKeyboardHeight;
 
 - (void)updateHUDFrame;
@@ -81,6 +91,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 - (void)cancelRingLayerAnimation;
 - (void)cancelIndefiniteAnimatedViewAnimation;
 
+///根据defaultStyle返回合适的颜色
 - (UIColor*)foregroundColorForStyle;
 - (UIColor*)backgroundColorForStyle;
 - (UIImage*)image:(UIImage*)image withTintColor:(UIColor*)color;
@@ -91,7 +102,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 @implementation SVProgressHUD {
     BOOL _isInitializing;
 }
-
+///SV_APP_EXTENSIONS 在扩展避免使用在扩展中不可用的api r
 + (SVProgressHUD*)sharedView {
     static dispatch_once_t once;
     
@@ -105,7 +116,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 }
 
 
-#pragma mark - Setters
+#pragma mark - Setters r
 
 + (void)setStatus:(NSString*)status {
     [[self sharedView] setStatus:status];
@@ -187,13 +198,14 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     [self sharedView].fadeOutAnimationDuration = duration;
 }
 
-
 #pragma mark - Show Methods
 
+///r
 + (void)show {
     [self showWithStatus:nil];
 }
 
+//r
 + (void)showWithMaskType:(SVProgressHUDMaskType)maskType {
     SVProgressHUDMaskType existingMaskType = [self sharedView].defaultMaskType;
     [self setDefaultMaskType:maskType];
@@ -201,33 +213,36 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     [self setDefaultMaskType:existingMaskType];
 }
 
+// SVProgressHUDUndefinedProgress r
 + (void)showWithStatus:(NSString*)status {
+    //创建sharedHud
     [self sharedView];
     [self showProgress:SVProgressHUDUndefinedProgress status:status];
 }
 
+//r
 + (void)showWithStatus:(NSString*)status maskType:(SVProgressHUDMaskType)maskType {
     SVProgressHUDMaskType existingMaskType = [self sharedView].defaultMaskType;
     [self setDefaultMaskType:maskType];
     [self showWithStatus:status];
     [self setDefaultMaskType:existingMaskType];
 }
-
+//r
 + (void)showProgress:(float)progress {
     [self showProgress:progress status:nil];
 }
-
+//r
 + (void)showProgress:(float)progress maskType:(SVProgressHUDMaskType)maskType {
     SVProgressHUDMaskType existingMaskType = [self sharedView].defaultMaskType;
     [self setDefaultMaskType:maskType];
     [self showProgress:progress];
     [self setDefaultMaskType:existingMaskType];
 }
-
+// 显示[self sharedView] r
 + (void)showProgress:(float)progress status:(NSString*)status {
     [[self sharedView] showProgress:progress status:status];
 }
-
+//r
 + (void)showProgress:(float)progress status:(NSString*)status maskType:(SVProgressHUDMaskType)maskType {
     SVProgressHUDMaskType existingMaskType = [self sharedView].defaultMaskType;
     [self setDefaultMaskType:maskType];
@@ -237,45 +252,45 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 
 #pragma mark - Show, then automatically dismiss methods
-
+//r
 + (void)showInfoWithStatus:(NSString*)status {
     [self showImage:[self sharedView].infoImage status:status];
 }
-
+//r
 + (void)showInfoWithStatus:(NSString*)status maskType:(SVProgressHUDMaskType)maskType {
     SVProgressHUDMaskType existingMaskType = [self sharedView].defaultMaskType;
     [self setDefaultMaskType:maskType];
     [self showInfoWithStatus:status];
     [self setDefaultMaskType:existingMaskType];
 }
-
+//r
 + (void)showSuccessWithStatus:(NSString*)status {
     [self showImage:[self sharedView].successImage status:status];
 }
-
+//r
 + (void)showSuccessWithStatus:(NSString*)status maskType:(SVProgressHUDMaskType)maskType {
     SVProgressHUDMaskType existingMaskType = [self sharedView].defaultMaskType;
     [self setDefaultMaskType:maskType];
     [self showSuccessWithStatus:status];
     [self setDefaultMaskType:existingMaskType];
 }
-
+//r
 + (void)showErrorWithStatus:(NSString*)status {
     [self showImage:[self sharedView].errorImage status:status];
 }
-
+//r
 + (void)showErrorWithStatus:(NSString*)status maskType:(SVProgressHUDMaskType)maskType {
     SVProgressHUDMaskType existingMaskType = [self sharedView].defaultMaskType;
     [self setDefaultMaskType:maskType];
     [self showErrorWithStatus:status];
     [self setDefaultMaskType:existingMaskType];
 }
-
+//r
 + (void)showImage:(UIImage*)image status:(NSString*)status {
     NSTimeInterval displayInterval = [self displayDurationForString:status];
     [[self sharedView] showImage:image status:status duration:displayInterval];
 }
-
+//r
 + (void)showImage:(UIImage*)image status:(NSString*)status maskType:(SVProgressHUDMaskType)maskType {
     SVProgressHUDMaskType existingMaskType = [self sharedView].defaultMaskType;
     [self setDefaultMaskType:maskType];
@@ -285,7 +300,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 
 #pragma mark - Dismiss Methods
-
+//r
 + (void)popActivity {
     if([self sharedView].activityCount > 0) {
         [self sharedView].activityCount--;
@@ -294,29 +309,29 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
         [[self sharedView] dismiss];
     }
 }
-
+//r
 + (void)dismiss {
     [self dismissWithDelay:0.0 completion:nil];
 }
-
+//r
 + (void)dismissWithDelay:(NSTimeInterval)delay {
     [self dismissWithDelay:delay completion:nil];
 }
-
+//r
 + (void)dismissWithCompletion:(SVProgressHUDDismissCompletion)completion {
     [self dismissWithDelay:0.0 completion:completion];
 }
-
+//r
 + (void)dismissWithDelay:(NSTimeInterval)delay completion:(SVProgressHUDDismissCompletion)completion {
     [[self sharedView] dismissWithDelay:delay completion:completion];
 }
 
 #pragma mark - Offset
-
+//r
 + (void)setOffsetFromCenter:(UIOffset)offset {
     [self sharedView].offsetFromCenter = offset;
 }
-
+//r
 + (void)resetOffsetFromCenter {
     [self setOffsetFromCenter:UIOffsetZero];
 }
@@ -324,10 +339,12 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 #pragma mark - Instance Methods
 
+///初始化一些样式信息 图片信息 没有子视图的初始化 r
 - (instancetype)initWithFrame:(CGRect)frame {
     if((self = [super initWithFrame:frame])) {
         _isInitializing = YES;
         
+        //不接受用户触摸事件
         self.userInteractionEnabled = NO;
         _backgroundColor = [UIColor clearColor];
         _foregroundColor = [UIColor blackColor];
@@ -336,17 +353,21 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
         self.alpha = 0.0f;
         self.activityCount = 0;
         
-        // Set default values
+        // Set default values 整体
         _defaultMaskType = SVProgressHUDMaskTypeNone;
+        
         _defaultStyle = SVProgressHUDStyleLight;
+        
         _defaultAnimationType = SVProgressHUDAnimationTypeFlat;
         
+        //字体
         if ([UIFont respondsToSelector:@selector(preferredFontForTextStyle:)]) {
             _font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
         } else {
             _font = [UIFont systemFontOfSize:14.0f];
         }
         
+        //取出bundle中的图片
         NSBundle *bundle = [NSBundle bundleForClass:[SVProgressHUD class]];
         NSURL *url = [bundle URLForResource:@"SVProgressHUD" withExtension:@"bundle"];
         NSBundle *imageBundle = [NSBundle bundleWithURL:url];
@@ -385,7 +406,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     }
     return self;
 }
-
+//r
 - (void)updateHUDFrame {
     // For the beginning use default values, these
     // might get update if string is too large etc.
@@ -433,6 +454,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
             hudHeight = stringHeightBuffer + stringHeight;
         }
         if(stringWidth > hudWidth) {
+            //23 -> 24 24.5 ->26
             hudWidth = ceilf(stringWidth/2)*2;
         }
         CGFloat labelRectY = (imageUsed || progressUsed) ? 68.0f : 9.0f;
@@ -450,6 +472,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     labelRect.size.width += MAX(0, self.minimumSize.width - hudWidth);
     [self updateBlurBounds];
     
+    //imageView位置
     if(string) {
         self.imageView.center = CGPointMake(CGRectGetWidth(self.hudView.bounds)/2, 36.0f);
     } else {
@@ -463,6 +486,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
     
+    //indefiniteAnimatedView.radius
 	if(string) {
         if(self.defaultAnimationType == SVProgressHUDAnimationTypeFlat) {
             SVIndefiniteAnimatedView *indefiniteAnimationView = (SVIndefiniteAnimatedView*)self.indefiniteAnimatedView;
@@ -494,6 +518,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     [CATransaction commit];
 }
 
+///根据defaultMaskType设置背景 r
 - (void)updateMask {
     if(self.backgroundLayer) {
         [self.backgroundLayer removeFromSuperlayer];
@@ -529,6 +554,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     }
 }
 
+///r
 - (void)updateBlurBounds {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
     if(NSClassFromString(@"UIBlurEffect") && self.defaultStyle != SVProgressHUDStyleCustom) {
@@ -564,6 +590,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 }
 
 #if TARGET_OS_IOS
+///r
 - (void)updateMotionEffectForOrientation:(UIInterfaceOrientation)orientation {
     UIInterpolatingMotionEffectType xMotionEffectType = UIInterfaceOrientationIsPortrait(orientation) ? UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis : UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis;
     UIInterpolatingMotionEffectType yMotionEffectType = UIInterfaceOrientationIsPortrait(orientation) ? UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis : UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis;
@@ -571,6 +598,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 }
 #endif
 
+///r
 - (void)updateMotionEffectForXMotionEffectType:(UIInterpolatingMotionEffectType)xMotionEffectType yMotionEffectType:(UIInterpolatingMotionEffectType)yMotionEffectType {
     if([self.hudView respondsToSelector:@selector(addMotionEffect:)]) {
         UIInterpolatingMotionEffect *effectX = [[UIInterpolatingMotionEffect alloc] initWithKeyPath:@"center.x" type:xMotionEffectType];
@@ -590,9 +618,11 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     }
 }
 
+///确保overlayView在合适的window上 self在overlayView上 hud在self上 r
 - (void)updateViewHierachy {
     // Add the overlay (e.g. black, gradient) to the application window if necessary
     if(!self.overlayView.superview) {
+        //将overlayView放到window上
 #if !defined(SV_APP_EXTENSIONS)
         // Default case: iterate over UIApplication windows
         NSEnumerator *frontToBackWindows = [UIApplication.sharedApplication.windows reverseObjectEnumerator];
@@ -628,12 +658,13 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
         [self addSubview:self.hudView];
     }
 }
-
+//r
 - (void)setStatus:(NSString*)status {
     self.statusLabel.text = status;
     [self updateHUDFrame];
 }
 
+///r
 - (void)setFadeOutTimer:(NSTimer*)timer {
     if(_fadeOutTimer) {
         [_fadeOutTimer invalidate], _fadeOutTimer = nil;
@@ -646,6 +677,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 #pragma mark - Notifications and their handling
 
+///注册键盘通知 屏幕方向改变通知
 - (void)registerNotifications {
 #if TARGET_OS_IOS
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -678,11 +710,12 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
                                                  name:UIApplicationDidBecomeActiveNotification
                                                object:nil];
 }
-
+//r
 - (NSDictionary*)notificationUserInfo{
     return (self.statusLabel.text ? @{SVProgressHUDStatusUserInfoKey : self.statusLabel.text} : nil);
 }
 
+///根据屏幕方向 以及键盘高度来确定hud位置 r
 - (void)positionHUD:(NSNotification*)notification {
     CGFloat keyboardHeight = 0.0f;
     double animationDuration = 0.0;
@@ -761,6 +794,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     }
     activeHeight -= keyboardHeight;
     
+    //计算位置
     CGFloat posX = CGRectGetWidth(orientationFrame)/2.0f;
     CGFloat posY = floorf(activeHeight*0.45f);
 
@@ -812,6 +846,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     [self updateMask];
 }
 
+///r
 - (void)moveToPoint:(CGPoint)newCenter rotateAngle:(CGFloat)angle {
     self.hudView.transform = CGAffineTransformMakeRotation(angle);
     self.hudView.center = CGPointMake(newCenter.x + self.offsetFromCenter.horizontal, newCenter.y + self.offsetFromCenter.vertical);
@@ -819,8 +854,9 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 
 #pragma mark - Event handling
-
+///背景被点击 post通知 r
 - (void)overlayViewDidReceiveTouchEvent:(id)sender forEvent:(UIEvent*)event {
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:SVProgressHUDDidReceiveTouchEventNotification
                                                         object:self
                                                       userInfo:[self notificationUserInfo]];
@@ -828,6 +864,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     UITouch *touch = event.allTouches.anyObject;
     CGPoint touchLocation = [touch locationInView:self];
     
+    //如果在hud上 则posthud被点击通知
     if(CGRectContainsPoint(self.hudView.frame, touchLocation)) {
         [[NSNotificationCenter defaultCenter] postNotificationName:SVProgressHUDDidTouchDownInsideNotification
                                                             object:self
@@ -838,6 +875,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 #pragma mark - Master show/dismiss methods
 
+///r
 - (void)showProgress:(float)progress status:(NSString*)status {
     __weak SVProgressHUD *weakSelf = self;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -892,7 +930,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
         }
     }];
 }
-
+//r
 - (void)showImage:(UIImage*)image status:(NSString*)status duration:(NSTimeInterval)duration {
     __weak SVProgressHUD *weakSelf = self;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -934,12 +972,15 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     }];
 }
 
+/// r 所有的样式 风格 最终都会调用这个方法
 - (void)showStatus:(NSString*)status {
     // Update the HUDs frame to the new content and position HUD
     [self updateHUDFrame];
+    //
     [self positionHUD:nil];
     
     // Update accesibilty as well as user interaction
+    //根据defaultMaskType != SVProgressHUDMaskTypeNone来确定是否可以点击背景
     if(self.defaultMaskType != SVProgressHUDMaskTypeNone) {
         self.overlayView.userInteractionEnabled = YES;
         self.accessibilityLabel = status;
@@ -1016,11 +1057,12 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
         [self setNeedsDisplay];
     }
 }
-
+//r
 - (void)dismiss {
     [self dismissWithDelay:0.0 completion:nil];
 }
 
+///activityCount = 0 r
 - (void)dismissWithDelay:(NSTimeInterval)delay completion:(SVProgressHUDDismissCompletion)completion {
     __weak SVProgressHUD *weakSelf = self;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -1103,7 +1145,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 
 #pragma mark - Ring progress animation
-
+///r
 - (UIView*)indefiniteAnimatedView {
     // Get the correct spinner for defaultAnimationType
     if(self.defaultAnimationType == SVProgressHUDAnimationTypeFlat){
@@ -1142,6 +1184,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     return _indefiniteAnimatedView;
 }
 
+//r
 - (SVProgressAnimatedView*)ringView {
     if(!_ringView) {
         _ringView = [[SVProgressAnimatedView alloc] initWithFrame:CGRectZero];
@@ -1155,6 +1198,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     return _ringView;
 }
 
+///r
 - (SVProgressAnimatedView*)backgroundRingView {
     if(!_backgroundRingView) {
         _backgroundRingView = [[SVProgressAnimatedView alloc] initWithFrame:CGRectZero];
@@ -1169,6 +1213,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     return _backgroundRingView;
 }
 
+///r
 - (void)cancelRingLayerAnimation {
     // Animate value update, stop animation
     [CATransaction begin];
@@ -1184,6 +1229,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     [self.backgroundRingView removeFromSuperview];
 }
 
+///r
 - (void)cancelIndefiniteAnimatedViewAnimation {
     // Stop animation
     if([self.indefiniteAnimatedView respondsToSelector:@selector(stopAnimating)]) {
@@ -1195,7 +1241,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 
 #pragma mark - Utilities
-
+//r
 + (BOOL)isVisible {
     return ([self sharedView].alpha > 0);
 }
@@ -1203,10 +1249,12 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 
 #pragma mark - Getters
 
+///根据字符串长度 计算显示的时间 r
 + (NSTimeInterval)displayDurationForString:(NSString*)string {
     return MAX((float)string.length * 0.06 + 0.5, [self sharedView].minimumDismissTimeInterval);
 }
 
+/// r
 - (UIColor*)foregroundColorForStyle {
     if(self.defaultStyle == SVProgressHUDStyleLight) {
         return [UIColor blackColor];
@@ -1216,7 +1264,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
         return self.foregroundColor;
     }
 }
-
+///r
 - (UIColor*)backgroundColorForStyle {
     if(self.defaultStyle == SVProgressHUDStyleLight) {
         return [UIColor whiteColor];
@@ -1227,6 +1275,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     }
 }
 
+//r
 - (UIImage*)image:(UIImage*)image withTintColor:(UIColor*)color {
     CGRect rect = CGRectMake(0.0f, 0.0f, image.size.width, image.size.height);
     UIGraphicsBeginImageContextWithOptions(rect.size, NO, image.scale);
@@ -1240,11 +1289,11 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     
     return tintedImage;
 }
-
+//r
 - (BOOL)isClear { // used for iOS 7 and above
     return (self.defaultMaskType == SVProgressHUDMaskTypeClear || self.defaultMaskType == SVProgressHUDMaskTypeNone);
 }
-
+//r
 - (UIControl*)overlayView {
     if(!_overlayView) {
 #if !defined(SV_APP_EXTENSIONS)
@@ -1260,6 +1309,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     return _overlayView;
 }
 
+///r
 - (UIView*)hudView {
     if(!_hudView) {
         _hudView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -1273,7 +1323,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     
     return _hudView;
 }
-
+//r
 - (UILabel*)statusLabel {
     if(!_statusLabel) {
         _statusLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -1294,6 +1344,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     return _statusLabel;
 }
 
+/// 初始化并添加到hud上 r
 - (UIImageView*)imageView {
     if(!_imageView) {
         _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 28.0f, 28.0f)];
@@ -1304,6 +1355,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
     return _imageView;
 }
 
+///获取键盘高度 r
 - (CGFloat)visibleKeyboardHeight {
 #if !defined(SV_APP_EXTENSIONS)
     UIWindow *keyboardWindow = nil;
@@ -1313,7 +1365,6 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
             break;
         }
     }
-    
     for (__strong UIView *possibleKeyboard in [keyboardWindow subviews]) {
         if([possibleKeyboard isKindOfClass:NSClassFromString(@"UIPeripheralHostView")] || [possibleKeyboard isKindOfClass:NSClassFromString(@"UIKeyboard")]) {
             return CGRectGetHeight(possibleKeyboard.bounds);
@@ -1330,7 +1381,7 @@ static const CGFloat SVProgressHUDDefaultAnimationDuration = 0.15;
 }
 
 
-#pragma mark - UIAppearance Setters
+#pragma mark - UIAppearance Setters r
 
 - (void)setDefaultStyle:(SVProgressHUDStyle)style {
     if (!_isInitializing) _defaultStyle = style;

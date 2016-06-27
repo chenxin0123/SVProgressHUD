@@ -15,7 +15,7 @@
 @end
 
 @implementation SVIndefiniteAnimatedView
-
+//r
 - (void)willMoveToSuperview:(UIView*)newSuperview {
     if (newSuperview) {
         [self layoutAnimatedLayer];
@@ -24,7 +24,7 @@
         _indefiniteAnimatedLayer = nil;
     }
 }
-
+//r
 - (void)layoutAnimatedLayer {
     CALayer *layer = self.indefiniteAnimatedLayer;
     [self.layer addSublayer:layer];
@@ -33,7 +33,7 @@
     CGFloat heightDiff = CGRectGetHeight(self.bounds) - CGRectGetHeight(layer.bounds);
     layer.position = CGPointMake(CGRectGetWidth(self.bounds) - CGRectGetWidth(layer.bounds) / 2 - widthDiff / 2, CGRectGetHeight(self.bounds) - CGRectGetHeight(layer.bounds) / 2 - heightDiff / 2);
 }
-
+//r
 - (CAShapeLayer*)indefiniteAnimatedLayer {
     if(!_indefiniteAnimatedLayer) {
         CGPoint arcCenter = CGPointMake(self.radius+self.strokeThickness/2+5, self.radius+self.strokeThickness/2+5);
@@ -50,17 +50,19 @@
         _indefiniteAnimatedLayer.path = smoothedPath.CGPath;
         
         CALayer *maskLayer = [CALayer layer];
+
+        //666
         
         NSBundle *bundle = [NSBundle bundleForClass:[SVProgressHUD class]];
         NSURL *url = [bundle URLForResource:@"SVProgressHUD" withExtension:@"bundle"];
         NSBundle *imageBundle = [NSBundle bundleWithURL:url];
-        
+
         NSString *path = [imageBundle pathForResource:@"angle-mask" ofType:@"png"];
-        
+
         maskLayer.contents = (__bridge id)[[UIImage imageWithContentsOfFile:path] CGImage];
         maskLayer.frame = _indefiniteAnimatedLayer.bounds;
         _indefiniteAnimatedLayer.mask = maskLayer;
-        
+
         NSTimeInterval animationDuration = 1;
         CAMediaTimingFunction *linearCurve = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
         
@@ -90,8 +92,11 @@
         strokeEndAnimation.toValue = @0.985;
         
         animationGroup.animations = @[strokeStartAnimation, strokeEndAnimation];
-        [_indefiniteAnimatedLayer addAnimation:animationGroup forKey:@"progress"];
-        
+        static int i = 0;
+        if (i%2 == 0) {
+            [_indefiniteAnimatedLayer addAnimation:animationGroup forKey:@"progress"];
+        }
+        i++;
     }
     return _indefiniteAnimatedLayer;
 }
@@ -130,6 +135,7 @@
     _indefiniteAnimatedLayer.lineWidth = _strokeThickness;
 }
 
+///sizeToFit 调用这个方法
 - (CGSize)sizeThatFits:(CGSize)size {
     return CGSizeMake((self.radius+self.strokeThickness/2+5)*2, (self.radius+self.strokeThickness/2+5)*2);
 }

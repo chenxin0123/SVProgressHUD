@@ -12,6 +12,7 @@
 
 
 #pragma mark - Notification Methods Sample
+//r
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
@@ -35,7 +36,7 @@
                                                  name:SVProgressHUDDidDisappearNotification
                                                object:nil];
 }
-
+//r
 - (void)handleNotification:(NSNotification *)notification {
     NSLog(@"Notification recieved: %@", notification.name);
     NSLog(@"Status user info key: %@", notification.userInfo[SVProgressHUDStatusUserInfoKey]);
@@ -43,23 +44,23 @@
 
 
 #pragma mark - Show Methods Sample
-
+//r
 - (void)show {
 	[SVProgressHUD show];
 }
-
+//r
 - (void)showWithStatus {
 	[SVProgressHUD showWithStatus:@"Doing Stuff"];
 }
 
 static float progress = 0.0f;
-
+//r
 - (IBAction)showWithProgress:(id)sender {
     progress = 0.0f;
     [SVProgressHUD showProgress:0 status:@"Loading"];
     [self performSelector:@selector(increaseProgress) withObject:nil afterDelay:0.3f];
 }
-
+//r
 - (void)increaseProgress {
     progress += 0.1f;
     [SVProgressHUD showProgress:progress status:@"Loading"];
@@ -73,26 +74,26 @@ static float progress = 0.0f;
 
 
 #pragma mark - Dismiss Methods Sample
-
+//r
 - (void)dismiss {
 	[SVProgressHUD dismiss];
 }
-
+//r
 - (IBAction)showInfoWithStatus {
     [SVProgressHUD showInfoWithStatus:@"Useful Information."];
 }
-
+//r
 - (void)showSuccessWithStatus {
 	[SVProgressHUD showSuccessWithStatus:@"Great Success!"];
 }
-
+//r
 - (void)showErrorWithStatus {
 	[SVProgressHUD showErrorWithStatus:@"Failed with Error"];
 }
 
 
 #pragma mark - Styling
-
+//r
 - (IBAction)changeStyle:(id)sender {
     UISegmentedControl *segmentedControl = (UISegmentedControl*)sender;
     if(segmentedControl.selectedSegmentIndex == 0){
@@ -101,7 +102,7 @@ static float progress = 0.0f;
         [SVProgressHUD setDefaultStyle:SVProgressHUDStyleDark];
     }
 }
-
+//r
 - (IBAction)changeAnimationType:(id)sender {
     UISegmentedControl *segmentedControl = (UISegmentedControl*)sender;
     if(segmentedControl.selectedSegmentIndex == 0){
@@ -110,7 +111,7 @@ static float progress = 0.0f;
         [SVProgressHUD setDefaultAnimationType:SVProgressHUDAnimationTypeNative];
     }
 }
-
+//r
 - (IBAction)changeMaskType:(id)sender {
     UISegmentedControl *segmentedControl = (UISegmentedControl*)sender;
     if(segmentedControl.selectedSegmentIndex == 0){
